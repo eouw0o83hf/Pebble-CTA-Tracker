@@ -1,6 +1,8 @@
 function _keysPrototype() {
-	this.ExampleHeader = 0;
-	this.ExampleBody = 1;
+	this.RouteName = 100;
+	this.Direction = 200;
+	this.EstimatedArrivalTime = 300;
+	this.StopName = 400;
 }
 var _keys = new _keysPrototype();
 
@@ -13,17 +15,25 @@ Pebble.addEventListener('appmessage', handleDataRequest);
 function handleDataRequest(e) {
 	console.log("AppMessage request received");
 	
-	// Initialize dictionary to send back
-	var data = {};
-	data[_keys.ExampleHeader] = 'example header';
-	data[_keys.ExampleBody] = 'example body';
+	var data = getDummyData();
 	
 	Pebble.sendAppMessage(data, sendSuccessCallback, sendErrorCallback);
-	console.log("AppMessage request received");
+	console.log("AppMessage responded");
 }
 
 function sendSuccessCallback(e) {
 }
 	
 function sendErrorCallback(e) {
+}
+
+function getDummyData() {
+	var response = {};
+	
+	response[_keys.RouteName] = "77";
+	response[_keys.Direction] = "East";
+	response[_keys.EstimatedArrivalTime] = 11;
+	response[_keys.StopName] = "Washtenaw";
+	
+	return response;
 }

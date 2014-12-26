@@ -1,6 +1,18 @@
 #include <pebble.h>
 
 //**********************************************
+//	Keys
+
+#define KEY_ROUTE_NAME				100
+#define KEY_DIRECTION				200
+#define KEY_ESTIMATED_ARRIVAL_TIME	300
+#define KEY_STOP_NAME				400
+
+//	/Keys
+//**********************************************
+
+	
+//**********************************************
 //	Fields	
 /// The main window
 static Window *s_main_window;
@@ -16,13 +28,27 @@ static Window *s_main_window;
 static void handleUpdate(DictionaryIterator *iterator) {
 	APP_LOG(APP_LOG_LEVEL_WARNING, "Update received");
 	
+	Tuple *route = dict_find(iterator, KEY_ROUTE_NAME);
+	Tuple *direction = dict_find(iterator, KEY_DIRECTION);
+	Tuple *time = dict_find(iterator, KEY_ESTIMATED_ARRIVAL_TIME);
+	Tuple *stop = dict_find(iterator, KEY_STOP_NAME);
+	
+	APP_LOG(APP_LOG_LEVEL_WARNING, "%s-bound %s coming to %s in %d minutes", 
+			direction->value->cstring,
+			route->value->cstring,
+			stop->value->cstring,
+			(int)time->value->int32
+		   );
+	
+	/*
   	Tuple *t = dict_read_first(iterator);
 	while(t != NULL) {
 		APP_LOG(APP_LOG_LEVEL_WARNING, "(Key, Value) => (%d, %s)", (int)t->key, t->value->cstring);
 		t = dict_read_next(iterator);
 	}
+	*/
 	
-	APP_LOG(APP_LOG_LEVEL_WARNING, "Done iterating response");
+	APP_LOG(APP_LOG_LEVEL_WARNING, "Done processing response");
 }
 
 //	/Data handling
