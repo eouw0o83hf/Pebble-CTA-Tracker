@@ -1,8 +1,9 @@
 function _keysPrototype() {
-	this.RouteName = 100;
-	this.Direction = 200;
-	this.EstimatedArrivalTime = 300;
-	this.StopName = 400;
+	this.RouteName = 0;
+	this.Direction = 1;
+	this.EstimatedArrivalTime = 2;
+	this.StopName = 3;
+	this.TotalFieldCount = 4;
 }
 var _keys = new _keysPrototype();
 
@@ -32,7 +33,7 @@ function getDummyData() {
 	
 	response[_keys.RouteName] = "77";
 	response[_keys.Direction] = "East";
-	response[_keys.EstimatedArrivalTime] = 11;
+	response[_keys.EstimatedArrivalTime] = "11";
 	response[_keys.StopName] = "Washtenaw";
 	
 	return response;
