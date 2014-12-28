@@ -31,3 +31,23 @@ function getDummyData() {
 	
 	return response;
 }
+
+function tagRegExp(tag) {
+	return new RegExp("<" + tag + ">((.|[\r\n])*?)<\/" + tag + ">", "gmi");
+}
+
+function getElements(data, tag) {
+	var groups = data.match(tagRegExp(tag));
+	var output = [];
+	for(var i = 0; i < groups.length; ++i) {
+		var matches = tagRegExp(tag).exec(groups[i]);
+		if(matches.length >= 2) {
+			output.push(matches[1]);
+		}
+	}
+	return output;
+}
+
+function getElement(data, tag) {
+	return getElements(data, tag)[0];
+}
