@@ -32,7 +32,7 @@ static void handleUpdate(DictionaryIterator *iterator) {
 		
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "parse iteration %d", i);
 		
-		snprintf(buffers[i], sizeof(buffers[i]), "Arriving on %s to %s in %s", nextArrival->RouteName, nextArrival->StopName, nextArrival->PredictedTime);
+		snprintf(buffers[i], sizeof(buffers[i]), "%s at %s in %s minutes", nextArrival->RouteName, nextArrival->StopName, nextArrival->PredictedTime);
 		text_layer_set_text(s_stop_listings[i], buffers[i]);
 		nextArrival = get_next_estimated_arrival(parseIterator);
 	}

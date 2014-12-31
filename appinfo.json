@@ -7,12 +7,19 @@
     "longName": "Chicago Transit bus and train tracker",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/icon.png",
+                "menuIcon": true,
+                "name": "BUS_ICON",
+                "type": "png"
+            }
+        ]
     },
     "shortName": "CTA Tracker",
     "uuid": "1d6ef2eb-6151-48a8-8c71-03cab8172abd",
     "versionCode": 1,
-    "versionLabel": "0.1",
+    "versionLabel": "0.2",
     "watchapp": {
         "watchface": false
     }

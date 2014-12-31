@@ -58,8 +58,8 @@ function handleDataReal(e) {
 		for(var i = 0; i < predictions.length; ++i) {
 			var offset = i * _keys.KeyCount;
 			response[_keys.RouteName + offset] = getElement(predictions[i], 'rt');
-			response[_keys.StopName + offset] = getElement(predictions[i], 'stpnm');
-			response[_keys.PredictedArrival + offset] = getElement(predictions[i], 'prdtm');
+			response[_keys.StopName + offset] = getElement(predictions[i], 'stpnm');			
+			response[_keys.PredictedArrival + offset] = minutesUntil(getElement(predictions[i], 'prdtm')).toString();
 		}		
 		
 		Pebble.sendAppMessage(response, sendSuccessCallback, sendErrorCallback);
@@ -96,6 +96,30 @@ function getElement(data, tag) {
 function tagRegExp(tag) {
 	return new RegExp("<" + tag + ">((.|[\r\n])*?)<\/" + tag + ">", "gmi");
 }
+
+
+//  Time helpers
+
+var dateRegex = /(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})/;
+/// Parses a date in the format yyyyMMdd hh:mm
+function parseDate(input) {
+	var parts = input.match(dateRegex);
+	parts = parts.slice(1);				// First match is the whole thing
+	parts[1] -= 1;						// Months are 0-based	
+	return new Date(parts[0], parts[1], parts[2], parts[3], parts[4]);
+}
+
+/// Determines how far in the future the given string is, in minutes
+function minutesUntil(input) {
+	var target = parseDate(input);
+	var now = new Date();
+	
+	var difference = target.getTime() - now.getTime();	// In milliseconds
+	return Math.ceil(difference / 60000);
+}
+
+
+// HTTP Request Wrappers
 
 /// XML HTTP Request helper
 function xhrRequest(url, type, callback) {
