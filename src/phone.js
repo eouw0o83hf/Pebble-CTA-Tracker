@@ -12,16 +12,6 @@ function _settingsPrototype() {
 var _settings = new _settingsPrototype();
 
 
-var xhrRequest = function(url, type, callback) {
-	var xhr = new XMLHttpRequest();
-	xhr.onload = function() {
-		callback(this.responseText);
-	};
-	xhr.open(type, url);
-	xhr.send();
-};
-
-
 // Called on appMessage wireup
 Pebble.addEventListener('ready', handleDataRequest);
 						
@@ -70,10 +60,6 @@ function handleDataReal(e) {
 			response[_keys.RouteName + offset] = getElement(predictions[i], 'rt');
 			response[_keys.StopName + offset] = getElement(predictions[i], 'stpnm');
 			response[_keys.PredictedArrival + offset] = getElement(predictions[i], 'prdtm');
-			
-			console.log("Route " + i + ": " + response[_keys.RouteName + offset]);
-			console.log("Stop " + i + ": " + response[_keys.StopName + offset]);
-			console.log("Time " + i + ": " + response[_keys.PredictedArrival + offset]);
 		}		
 		
 		Pebble.sendAppMessage(response, sendSuccessCallback, sendErrorCallback);
@@ -83,10 +69,12 @@ function handleDataReal(e) {
 //********************************************************************
 //	Helper/Library Methods
 
-function tagRegExp(tag) {
-	return new RegExp("<" + tag + ">((.|[\r\n])*?)<\/" + tag + ">", "gmi");
-}
+//	These do simple regex-based xml reading, with a couple of assumptions
+//	which seem to be true of the CTA API:
+//		1. No node type is a descendent of itself.
+//		2. We only care about actual, textual body of a node; no attributes
 
+/// Gets the body of all elements of the given tag, case-invariant
 function getElements(data, tag) {
 	var groups = data.match(tagRegExp(tag));
 	var output = [];
@@ -99,8 +87,23 @@ function getElements(data, tag) {
 	return output;
 }
 
+/// Gets the first element of the given tag, case-invariant
 function getElement(data, tag) {
 	return getElements(data, tag)[0];
 }
 
+/// Regex to pull matches of an xml tag, line- and case-invariant
+function tagRegExp(tag) {
+	return new RegExp("<" + tag + ">((.|[\r\n])*?)<\/" + tag + ">", "gmi");
+}
+
+/// XML HTTP Request helper
+function xhrRequest(url, type, callback) {
+	var xhr = new XMLHttpRequest();
+	xhr.onload = function() {
+		callback(this.responseText);
+	};
+	xhr.open(type, url);
+	xhr.send();
+}
 //********************************************************************
