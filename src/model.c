@@ -3,36 +3,45 @@
 #include <string.h>
 #include "model.h"
 
+//**********************************************
+//	Keys
 
-TransitStop* transit_stop_parse(char *routeName, char *stopName) {
-	
-	TransitStop* response = malloc(128);
-	
-	response->RouteName = routeName;
-	response->StopName = stopName;
-	
-	return response;
-}
+#define KEY_ROUTE_NAME			0
+#define KEY_STOP_NAME			1
+#define KEY_PREDICTED_ARRIVAL	2
+#define KEYS_COUNT 				3
 
-EstimatedArrivalIterator* get_estimated_arrival_iterator(char *arrivalInfo) {
-	EstimatedArrivalIterator *response = malloc(sizeof(arrivalInfo) + sizeof(int));
+EstimatedArrivalIterator* get_estimated_arrival_iterator(DictionaryIterator *iterator) {
+	EstimatedArrivalIterator* response = malloc(16);
 	
-	response->ArrivalInfo = arrivalInfo;
+	response->Iterator = iterator;
 	response->Index = 0;
 	
 	return response;
 }
 
 EstimatedArrival* get_next_estimated_arrival(EstimatedArrivalIterator *iterator) {
-	if(iterator->Index >= 2) {
+	int offset = iterator->Index * KEYS_COUNT;
+	
+	Tuple *routeName = dict_find(iterator->Iterator, KEY_ROUTE_NAME + offset);
+	if(routeName == NULL) {
 		return NULL;
 	}
 	
+	if(iterator->Current != NULL) {
+		free(iterator->Current);
+	}
+	
+	Tuple *stopName = dict_find(iterator->Iterator, KEY_STOP_NAME + offset);	
+	Tuple *arrival = dict_find(iterator->Iterator, KEY_PREDICTED_ARRIVAL + offset);
+		
+	EstimatedArrival* response = malloc(128);
+	response->PredictedTime = arrival->value->cstring;
+	response->StopName = stopName->value->cstring;
+	response->RouteName = routeName->value->cstring;
+	
+	iterator->Current = response;
 	iterator->Index++;
 	
-	EstimatedArrival* response = malloc(128);
-	response->Time = iterator->Index;
-	response->VehicleId = "Random";
-	response->Direction = "East";
 	return response;
 }

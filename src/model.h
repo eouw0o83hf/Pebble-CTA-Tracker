@@ -1,21 +1,16 @@
 #pragma once
 
-typedef struct TransitStop {
+typedef struct {
 	char *RouteName;
 	char *StopName;
-} TransitStop;
-
-typedef struct {
-	int Time;
-	char *VehicleId;
-	char *Direction;
+	char *PredictedTime;
 } EstimatedArrival;
 
 typedef struct {
-	char *ArrivalInfo;
+	DictionaryIterator *Iterator;
 	int Index;
+	EstimatedArrival *Current;
 } EstimatedArrivalIterator;
 
-TransitStop* transit_stop_parse(char *routeName, char *stopName);
-EstimatedArrivalIterator* get_estimated_arrival_iterator(char *arrivalInfo); 
+EstimatedArrivalIterator* get_estimated_arrival_iterator(DictionaryIterator *iterator); 
 EstimatedArrival* get_next_estimated_arrival(EstimatedArrivalIterator *iterator);

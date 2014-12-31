@@ -1,13 +1,6 @@
 #include <pebble.h>
 #include "model.h"
 
-//**********************************************
-//	Keys
-
-#define KEY_ROUTE_NAME	0
-#define KEY_STOP_NAME	1
-#define KEY_STOP_DATA	2
-
 #define LISTING_COUNT 10
 #define LISTING_HEIGHT 50
 	
@@ -29,32 +22,22 @@ static TextLayer *s_stop_listings[LISTING_COUNT];
 //**********************************************
 //	Data handling
 
-static void handleUpdate(DictionaryIterator *iterator) {	
-	Tuple *routeName = dict_find(iterator, KEY_ROUTE_NAME);	
-	Tuple *stopName = dict_find(iterator, KEY_STOP_NAME);	
-	Tuple *stopData = dict_find(iterator, KEY_STOP_DATA);
+static void handleUpdate(DictionaryIterator *iterator) {		
+	EstimatedArrivalIterator* parseIterator = get_estimated_arrival_iterator(iterator);
+	EstimatedArrival* nextArrival = get_next_estimated_arrival(parseIterator);
 	
-	TransitStop* stop = transit_stop_parse(routeName->value->cstring, stopName->value->cstring);
-	EstimatedArrivalIterator* parseIterator = get_estimated_arrival_iterator(stopData->value->cstring);
-	
-	for(int i = 0; i < LISTING_COUNT; ++i) {
-		EstimatedArrival* arrival = get_next_estimated_arrival(parseIterator);
+	static char buffers[LISTING_COUNT][256];
 		
-		if(arrival == NULL) {
-			text_layer_set_text(s_stop_listings[i], "");
-			continue;
-		}
+	for(int i = 0; nextArrival != NULL && i < LISTING_COUNT; ++i) {
 		
-		static char buffer[256];
-		snprintf(buffer, sizeof(buffer), "Arriving on %s to %s in %d minutes", stop->RouteName, stop->StopName, arrival->Time);
-		text_layer_set_text(s_stop_listings[i], buffer);
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "parse iteration %d", i);
+		
+		snprintf(buffers[i], sizeof(buffers[i]), "Arriving on %s to %s in %s", nextArrival->RouteName, nextArrival->StopName, nextArrival->PredictedTime);
+		text_layer_set_text(s_stop_listings[i], buffers[i]);
+		nextArrival = get_next_estimated_arrival(parseIterator);
 	}
 	
-	/*
-	GSize max_size = text_layer_get_content_size(s_stop_text);
-	text_layer_set_size(s_stop_text, max_size);
- 	scroll_layer_set_content_size(s_scroll_layer, GSize(max_size.w, max_size.h));
-	*/
+	free(parseIterator);
 }
 
 //	/Data handling
@@ -98,10 +81,9 @@ static void main_window_load(Window *window) {
 	GRect bounds = layer_get_frame(window_layer);
 	//GRect max_text_bounds = GRect(0, 0, bounds.size.w, 20000);
 	
-	//int height = 50;
-	
 	s_scroll_layer = scroll_layer_create(bounds);
-	// Bind scrolling to layer
+	layer_add_child(window_layer, scroll_layer_get_layer(s_scroll_layer));
+	scroll_layer_set_content_size(s_scroll_layer, GSize(144, LISTING_COUNT * LISTING_HEIGHT));
 	scroll_layer_set_click_config_onto_window(s_scroll_layer, window);
 	
 	for(int i = 0; i < LISTING_COUNT; ++i) {
@@ -114,9 +96,7 @@ static void main_window_load(Window *window) {
 		text_layer_set_font(s_stop_listings[i], fonts_get_system_font(FONT_KEY_GOTHIC_14));
 
 		scroll_layer_add_child(s_scroll_layer, text_layer_get_layer(s_stop_listings[i]));
-	}
-	
-	layer_add_child(window_layer, scroll_layer_get_layer(s_scroll_layer));	
+	}	
 }
 
 /// Called when the window is unloaded
