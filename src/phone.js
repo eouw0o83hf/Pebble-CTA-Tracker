@@ -2,7 +2,8 @@ function _keysPrototype() {
 	this.RouteName = 0;
 	this.StopName = 1;
 	this.PredictedArrival = 2;
-	this.KeyCount = 3;
+	this.BusDirection = 3;
+	this.KeyCount = 4;
 }
 var _keys = new _keysPrototype();
 
@@ -60,6 +61,7 @@ function handleDataReal(e) {
 			response[_keys.RouteName + offset] = getElement(predictions[i], 'rt');
 			response[_keys.StopName + offset] = getElement(predictions[i], 'stpnm');			
 			response[_keys.PredictedArrival + offset] = minutesUntil(getElement(predictions[i], 'prdtm')).toString();
+			response[_keys.BusDirection + offset] = getElement(predictions[i], 'rtdir')[0];
 		}		
 		
 		Pebble.sendAppMessage(response, sendSuccessCallback, sendErrorCallback);
@@ -89,7 +91,7 @@ function getElements(data, tag) {
 
 /// Gets the first element of the given tag, case-invariant
 function getElement(data, tag) {
-	return getElements(data, tag)[0];
+	return cleanseXmlEscape(getElements(data, tag)[0]);
 }
 
 /// Regex to pull matches of an xml tag, line- and case-invariant
@@ -97,6 +99,13 @@ function tagRegExp(tag) {
 	return new RegExp("<" + tag + ">((.|[\r\n])*?)<\/" + tag + ">", "gmi");
 }
 
+function cleanseXmlEscape(input) {
+	return input.replace(/&quot;/gim, '"')
+				.replace(/&apos;/gim, '\'')
+				.replace(/&lt;/gim, '<')
+				.replace(/&gt;/gim, '>')
+				.replace(/&amp;/gim, '&');	
+}
 
 //  Time helpers
 

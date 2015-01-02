@@ -4,6 +4,7 @@ typedef struct {
 	char *RouteName;
 	char *StopName;
 	char *PredictedTime;
+	char *Direction;
 } EstimatedArrival;
 
 typedef struct {

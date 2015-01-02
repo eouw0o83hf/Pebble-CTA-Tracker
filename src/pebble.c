@@ -28,11 +28,17 @@ static void handleUpdate(DictionaryIterator *iterator) {
 	
 	static char buffers[LISTING_COUNT][256];
 		
-	for(int i = 0; nextArrival != NULL && i < LISTING_COUNT; ++i) {
+	for(int i = 1; nextArrival != NULL && i < LISTING_COUNT; ++i) {
+		
+		if(i == 1) {
+			snprintf(buffers[0], sizeof(buffers[0]), "%s", nextArrival->StopName);
+			text_layer_set_text(s_stop_listings[0], buffers[0]);
+		}
+		
 		
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "parse iteration %d", i);
 		
-		snprintf(buffers[i], sizeof(buffers[i]), "%s at %s in %s minutes", nextArrival->RouteName, nextArrival->StopName, nextArrival->PredictedTime);
+		snprintf(buffers[i], sizeof(buffers[i]), "%s %s  %sm", nextArrival->RouteName, nextArrival->Direction, nextArrival->PredictedTime);
 		text_layer_set_text(s_stop_listings[i], buffers[i]);
 		nextArrival = get_next_estimated_arrival(parseIterator);
 	}
@@ -93,7 +99,7 @@ static void main_window_load(Window *window) {
 		text_layer_set_text_color(s_stop_listings[i], GColorWhite);
 		text_layer_set_text_alignment(s_stop_listings[i], GTextAlignmentLeft);
 		text_layer_set_text(s_stop_listings[i], "");
-		text_layer_set_font(s_stop_listings[i], fonts_get_system_font(FONT_KEY_GOTHIC_14));
+		text_layer_set_font(s_stop_listings[i], fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
 
 		scroll_layer_add_child(s_scroll_layer, text_layer_get_layer(s_stop_listings[i]));
 	}	
